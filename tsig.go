@@ -44,6 +44,21 @@ func (c *Client) GetTsigKey(ctx context.Context, keyName string) (*TsigKey, erro
 	return &key, nil
 }
 
+// GetDomainTsig retrieves all TSIG keys and permissions for a domain.
+func (c *Client) GetDomainTsig(ctx context.Context, domainName string) (map[string]DomainTsigPermissions, error) {
+	encodedDomain := url.PathEscape(domainName)
+	path := fmt.Sprintf("/dns/%s/tsig", encodedDomain)
+
+	var res map[string]DomainTsigPermissions
+	if err := c.request(ctx, "GET", path, nil, nil, &res); err != nil {
+		return nil, err
+	}
+	if res == nil {
+		return map[string]DomainTsigPermissions{}, nil
+	}
+	return res, nil
+}
+
 // DeleteDomainTsig deletes all TSIG keys on a domain.
 func (c *Client) DeleteDomainTsig(ctx context.Context, domainName string) error {
 	encodedDomain := url.PathEscape(domainName)
@@ -53,7 +68,7 @@ func (c *Client) DeleteDomainTsig(ctx context.Context, domainName string) error 
 }
 
 // UpdateDomainTsig updates TSIG key permissions for a domain.
-func (c *Client) UpdateDomainTsig(ctx context.Context, domainName, keyName string, allowAxfr, allowDnsUpdate bool) error {
+func (c *Client) UpdateDomainTsig(ctx context.Context, domainName, keyName string, allowAxfr, allowDnsUpdate bool, subdomains ...string) error {
 	encodedDomain := url.PathEscape(domainName)
 	encodedKey := url.PathEscape(keyName)
 	path := fmt.Sprintf("/dns/%s/tsig/%s", encodedDomain, encodedKey)
@@ -61,6 +76,7 @@ func (c *Client) UpdateDomainTsig(ctx context.Context, domainName, keyName strin
 	body := DomainTsigPermissions{
 		AllowAxfr:      allowAxfr,
 		AllowDnsUpdate: allowDnsUpdate,
+		Subdomains:     subdomains,
 	}
 
 	return c.request(ctx, "PATCH", path, nil, body, nil)

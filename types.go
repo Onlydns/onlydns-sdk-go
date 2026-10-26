@@ -117,8 +117,9 @@ type CreateTsigKeyRequest struct {
 
 // DomainTsigPermissions represents the permissions for a TSIG key on a domain.
 type DomainTsigPermissions struct {
-	AllowAxfr      bool `json:"allowAxfr"`
-	AllowDnsUpdate bool `json:"allowDnsUpdate"`
+	AllowAxfr      bool     `json:"allowAxfr"`
+	AllowDnsUpdate bool     `json:"allowDnsUpdate"`
+	Subdomains     []string `json:"subdomains,omitempty"`
 }
 
 // ListDomainsOptions specifies pagination options for listing domains.
