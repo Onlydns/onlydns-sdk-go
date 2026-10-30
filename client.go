@@ -13,7 +13,10 @@ import (
 	"time"
 )
 
-const DefaultBaseURL = "https://api.onlydns.com/v1"
+const (
+	Version        = "1.0.1"
+	DefaultBaseURL = "https://api.onlydns.com/v1"
+)
 
 // Client is the OnlyDNS API client.
 type Client struct {
@@ -47,20 +50,17 @@ func WithTimeout(timeout time.Duration) Option {
 }
 
 // NewClient initializes a new OnlyDNS Client.
-// If apiToken is empty, it attempts to load from ONLYDNS_API_KEY or ONLYDNS_API_TOKEN environment variables.
+// If apiToken is empty, it attempts to load from ONLYDNS_API_TOKEN environment variable.
 func NewClient(apiToken string, opts ...Option) (*Client, error) {
 	token := apiToken
 	if token == "" {
-		token = os.Getenv("ONLYDNS_API_KEY")
-		if token == "" {
-			token = os.Getenv("ONLYDNS_API_TOKEN")
-		}
+		token = os.Getenv("ONLYDNS_API_TOKEN")
 	}
 	if token == "" {
 		return nil, &AuthenticationError{
 			APIError: APIError{
 				StatusCode: 401,
-				Message:    "API token is required. Pass apiToken or set ONLYDNS_API_KEY environment variable",
+				Message:    "API token is required. Pass apiToken or set ONLYDNS_API_TOKEN environment variable",
 			},
 		}
 	}
@@ -103,7 +103,7 @@ func (c *Client) request(ctx context.Context, method, path string, query url.Val
 
 	req.Header.Set("Authorization", "Bearer "+c.APIToken)
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "OnlyDNS-Go-SDK/1.0.0")
+	req.Header.Set("User-Agent", "OnlyDNS-Go-SDK/"+Version)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}

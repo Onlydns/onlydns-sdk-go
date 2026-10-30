@@ -1,15 +1,19 @@
 # OnlyDNS Go SDK
 
-Official Go SDK for the [OnlyDNS System API](https://api-docs.onlydns.com/).
+Official Go SDK for [OnlyDNS](https://www.onlydns.com) to programmatically manage authoritative Anycast DNS zones, records, 1-click DNSSEC, and RFC 2136 TSIG keys. Learn more in the [OnlyDNS Technical How-To Guides](https://www.onlydns.com/howto/).
 
-Built for high-performance DNS management in Go applications, microservices, and AI Agent tool integrations.
+```bash
+go get github.com/onlydns/onlydns-sdk-go
+```
+
+**Authentication Environment Variable:** `ONLYDNS_API_TOKEN`.
 
 ## Features
 
 - **Idiomatic Go**: Context-aware API calls, clean error handling, and zero external dependencies.
 - **High-Level Atomic Helpers**: Convenient methods (`AddRecord`, `RemoveRecord`, `UpdateRecord`, `FindRecords`) that manage read-modify-write cycles over bulk replacement.
 - **Complete TSIG Key Management**: Generate and assign TSIG keys with fine-grained AXFR / DNS update permissions.
-- **Environment Auto-Detection**: Automatically reads token from `ONLYDNS_API_KEY` or `ONLYDNS_API_TOKEN`.
+- **Environment Auto-Detection**: Automatically reads token from `ONLYDNS_API_TOKEN`.
 
 ## Installation
 
@@ -33,7 +37,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// Initialize client (defaults to ONLYDNS_API_KEY from environment)
+	// Initialize client (defaults to ONLYDNS_API_TOKEN from environment)
 	client, err := onlydns.NewClient("your_api_token_here")
 	if err != nil {
 		log.Fatalf("Failed to initialize client: %v", err)

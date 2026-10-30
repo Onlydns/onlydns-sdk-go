@@ -11,7 +11,6 @@ import (
 )
 
 func TestClientAuthMissing(t *testing.T) {
-	t.Setenv("ONLYDNS_API_KEY", "")
 	t.Setenv("ONLYDNS_API_TOKEN", "")
 
 	_, err := onlydns.NewClient("")
