@@ -135,3 +135,177 @@ type APIErrorResponse struct {
 	Title       string   `json:"title,omitempty"`
 	Description []string `json:"description,omitempty"`
 }
+
+// AccountPostalAddress represents an account contact postal address.
+type AccountPostalAddress struct {
+	Street1    string `json:"street1,omitempty"`
+	Street2    string `json:"street2,omitempty"`
+	Street3    string `json:"street3,omitempty"`
+	City       string `json:"city,omitempty"`
+	State      string `json:"state,omitempty"`
+	CountryID  string `json:"countryId,omitempty"`
+	PostalCode string `json:"postalCode,omitempty"`
+}
+
+// BillingPackageFeatures represents feature capabilities included in the billing package.
+type BillingPackageFeatures struct {
+	Domains   int  `json:"domains"`
+	Records   int  `json:"records"`
+	Queries   int  `json:"queries"`
+	DNSSEC    bool `json:"dnssec"`
+	TSIG      bool `json:"tsig"`
+	Proxy     bool `json:"proxy"`
+	CustomSSO bool `json:"customSSO"`
+}
+
+// BillingPackage represents billing package details and feature entitlements.
+type BillingPackage struct {
+	ID          string                 `json:"id"`
+	Description string                 `json:"description"`
+	Amount      float64                `json:"amount"`
+	Features    BillingPackageFeatures `json:"features"`
+}
+
+// AccountInfo represents account information and feature entitlements.
+type AccountInfo struct {
+	AccountID   string                `json:"accountId"`
+	ActiveAt    *string               `json:"activeAt,omitempty"`
+	CompanyName string                `json:"companyName,omitempty"`
+	FirstName   string                `json:"firstName,omitempty"`
+	LastName    string                `json:"lastName,omitempty"`
+	Address     *AccountPostalAddress `json:"address,omitempty"`
+	Package     *BillingPackage       `json:"package,omitempty"`
+}
+
+// Money represents a monetary value with a currency code.
+type Money struct {
+	Value    string `json:"value"`
+	Currency string `json:"currency"`
+}
+
+// BillingStatusResponse represents the billing state and balance summary.
+type BillingStatusResponse struct {
+	AccountID              string  `json:"accountId"`
+	Currency               string  `json:"currency"`
+	AmountDue              Money   `json:"amountDue"`
+	PastDueAmount          Money   `json:"pastDueAmount"`
+	BillingAssessedTo      *string `json:"billingAssessedTo,omitempty"`
+	SuspendedAt            *string `json:"suspendedAt,omitempty"`
+	PastDue                bool    `json:"pastDue"`
+	Suspended              bool    `json:"suspended"`
+	SuspendedForNonPayment bool    `json:"suspendedForNonPayment"`
+	PaymentRequired        bool    `json:"paymentRequired"`
+	Payable                bool    `json:"payable"`
+}
+
+// AccountMetricUsage represents a usage metric with observed count and plan limit.
+type AccountMetricUsage struct {
+	Current int `json:"current"`
+	Limit   int `json:"limit"`
+}
+
+// AccountMetricRecords represents DNS record metrics including portfolio total, peak single-zone record count, peak zone name, and per-zone plan limit.
+type AccountMetricRecords struct {
+	TotalRecords   int     `json:"totalRecords"`
+	MaxZoneRecords int     `json:"maxZoneRecords"`
+	MaxZoneName    *string `json:"maxZoneName,omitempty"`
+	LimitPerZone   int     `json:"limitPerZone"`
+	Current        *int    `json:"current,omitempty"`
+	Limit          *int    `json:"limit,omitempty"`
+}
+
+// AccountMetricApiRequestsPerMinute represents API request rate metrics including current, 24h average, and limit.
+type AccountMetricApiRequestsPerMinute struct {
+	Current            int     `json:"current"`
+	AverageLast24Hours float64 `json:"averageLast24Hours"`
+	Limit              int     `json:"limit"`
+}
+
+// AccountMetricDNSSEC represents DNSSEC usage metric and package entitlement status.
+type AccountMetricDNSSEC struct {
+	Current int  `json:"current"`
+	Enabled bool `json:"enabled"`
+}
+
+// AccountMetricsUsage represents aggregated usage metrics for an account.
+type AccountMetricsUsage struct {
+	Domains              AccountMetricUsage                `json:"domains"`
+	Records              AccountMetricRecords              `json:"records"`
+	Queries              AccountMetricUsage                `json:"queries"`
+	DNSSEC               AccountMetricDNSSEC               `json:"dnssec"`
+	TSIGKeys             AccountMetricUsage                `json:"tsigKeys"`
+	ChangesLast24Hours   AccountMetricUsage                `json:"changesLast24Hours"`
+	APIRequestsPerMinute AccountMetricApiRequestsPerMinute `json:"apiRequestsPerMinute"`
+	APITokens            AccountMetricUsage                `json:"apiTokens"`
+}
+
+// AccountMetricsPackage represents package summary in metrics response.
+type AccountMetricsPackage struct {
+	ID          string `json:"id"`
+	Description string `json:"description"`
+}
+
+// AccountMetricsResponse represents the response returned by GET /account/metrics.
+type AccountMetricsResponse struct {
+	AccountID string                 `json:"accountId"`
+	Package   *AccountMetricsPackage `json:"package,omitempty"`
+	Usage     AccountMetricsUsage    `json:"usage"`
+}
+
+// AccountOidcNonCompliantUser represents a user who cannot use custom SSO until migration.
+type AccountOidcNonCompliantUser struct {
+	UserID      string  `json:"userId"`
+	UserName    string  `json:"userName"`
+	SSOProvider *string `json:"ssoProvider,omitempty"`
+	Reason      string  `json:"reason"`
+}
+
+// AccountOidcResponse represents custom OIDC Single Sign-On configuration for an account.
+type AccountOidcResponse struct {
+	Configured            bool                          `json:"configured"`
+	AccountID             *string                       `json:"accountId,omitempty"`
+	DiscoveryURL          *string                       `json:"discoveryUrl,omitempty"`
+	ClientID              *string                       `json:"clientId,omitempty"`
+	ClientSecretMasked    *string                       `json:"clientSecretMasked,omitempty"`
+	EnforceSSO            bool                          `json:"enforceSso"`
+	BreakGlassAdminsCount int                           `json:"breakGlassAdminsCount"`
+	CanEnforceSSO         bool                          `json:"canEnforceSso"`
+	NonCompliantUsers     []AccountOidcNonCompliantUser `json:"nonCompliantUsers,omitempty"`
+	CreatedAt             *string                       `json:"createdAt,omitempty"`
+	UpdatedAt             *string                       `json:"updatedAt,omitempty"`
+}
+
+// SaveAccountOidcRequest represents the request body for creating or updating custom OIDC SSO.
+type SaveAccountOidcRequest struct {
+	DiscoveryURL string `json:"discoveryUrl,omitempty"`
+	ClientID     string `json:"clientId,omitempty"`
+	ClientSecret string `json:"clientSecret,omitempty"`
+	EnforceSSO   *bool  `json:"enforceSso,omitempty"`
+}
+
+// AccountOidcDeleteResponse represents the response for deleting custom OIDC SSO configuration.
+type AccountOidcDeleteResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+// AccountOidcTestRequest represents the payload for testing an OIDC discovery URL.
+type AccountOidcTestRequest struct {
+	DiscoveryURL string `json:"discoveryUrl,omitempty"`
+	ClientID     string `json:"clientId,omitempty"`
+	ClientSecret string `json:"clientSecret,omitempty"`
+}
+
+// AccountOidcTestResponse represents the response for testing an OIDC discovery URL.
+type AccountOidcTestResponse struct {
+	Success                 bool     `json:"success"`
+	Valid                   bool     `json:"valid,omitempty"`
+	ClientCredentialsTested *bool    `json:"clientCredentialsTested,omitempty"`
+	ClientCredentialsValid  *bool    `json:"clientCredentialsValid,omitempty"`
+	Issuer                  *string  `json:"issuer,omitempty"`
+	AuthorizationEndpoint   *string  `json:"authorizationEndpoint,omitempty"`
+	TokenEndpoint           *string  `json:"tokenEndpoint,omitempty"`
+	JwksURI                 *string  `json:"jwksUri,omitempty"`
+	UserinfoEndpoint        *string  `json:"userinfoEndpoint,omitempty"`
+	ScopesSupported         []string `json:"scopesSupported,omitempty"`
+}

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	Version        = "1.0.1"
+	Version        = "1.0.2"
 	DefaultBaseURL = "https://api.onlydns.com/v1"
 )
 
